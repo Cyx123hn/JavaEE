@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.situ.mall.goods.mapper.GoodsImgMapper">
+
+	<!-- Result Map 结果映射 查询时使用 -->
+	<resultMap id="BaseResultMap" type="com.situ.mall.goods.model.GoodsImgModel">
+		<result column="id" property="id" />
+		<result column="goods_code" property="goodsCode" />
+		<result column="url" property="url" />
+		<result column="type" property="type" />		
+	</resultMap>
+
+	<!-- 查询条件 -->
+	<sql id="TiaoJian">
+		where 1=1
+		<if test="id !=null">
+			and id=#{id}
+		</if>
+		<if test="goodsCode !=null and goodsCode !=''">
+			and goods_code like #{goodsCode}
+		</if>
+		<if test="url !=null and url !=''">
+			and url like #{url}
+		</if>
+		<if test="type !=null and type !=''">
+			and name type #{type}
+		</if>
+		
+
+	</sql>
+
+
+	<!-- table all fields sql片段 -->
+	<sql id="Base_Column_List">
+		id, goods_code,url,type 
+	</sql>
+	<!-- table all fields sql片段 -->
+	<sql id="UserName">
+		p2c.goods_img
+	</sql>
+
+
+
+	<insert id="insert" parameterType="Object">
+		insert into
+		<include refid="UserName" />
+		(goods_code,url,type )
+		values(#{goodsCode},
+		#{url},#{type} )
+	</insert>
+
+	<delete id="delete" parameterType="Object">
+		delete from
+		<include refid="UserName" />
+		<include refid="TiaoJian"></include>
+
+	</delete>
+
+
+
+
+	<!-- 修改记录，只修改只不为空的字段 -->
+	<update id="update" parameterType="Object">
+		update
+		<include refid="UserName" />
+		set
+		<trim suffixOverrides=",">
+			
+			<if test="url !=null and url !=''">
+				url = #{url},
+			</if>
+			<if test="type !=null and type !=''">
+				type = #{type},
+			</if>
+			
+		</trim>
+		where id = #{id}
+	</update>
+
+
+
+	<!-- 根据id 查询系统用户 -->
+	<select id="selectById" resultMap="BaseResultMap"
+		parameterType="Object">
+		select
+		<include refid="Base_Column_List" />
+		from
+		<include refid="UserName" />
+		where id=#{id}
+	</select>
+	<!-- 根据code 查询系统用户 -->
+	<select id="selectByCode" resultMap="BaseResultMap"
+		parameterType="Object">
+		select
+		<include refid="Base_Column_List" />
+		from
+		<include refid="UserName" />
+		where goods_code=#{goods_code}
+	</select>
+	<!-- 查询系统用户列表 -->
+	<select id="selectCount" resultType="java.lang.Integer"
+		parameterType="Object">
+		select count(1)
+		from
+		<include refid="UserName" />
+		<include refid="TiaoJian" />
+	</select>
+
+
+	<!-- 查询系统用户列表 -->
+	<select id="selectModel" resultMap="BaseResultMap"
+		parameterType="Object">
+		select
+		<include refid="Base_Column_List" />
+		from
+		<include refid="UserName" />
+		<include refid="TiaoJian" />
+		limit ${rowStart},${pageLimit}
+	</select>
+	<!-- 查询系统用户列表 -->
+	<select id="selectAll" resultMap="BaseResultMap"
+		parameterType="Object">
+		select
+		<include refid="Base_Column_List" />
+		from
+		<include refid="UserName" />
+		<include refid="TiaoJian" />
+	</select>
+
+
+
+</mapper>   

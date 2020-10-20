@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.situ.mall.order.mapper.OrderMapper">
+   
+	<!-- Result Map 结果映射 查询时使用 -->
+	<resultMap id="BaseResultMap" type="com.situ.mall.order.model.OrderModel">
+		<result column="id" property="id" />
+		<result column="code" property="code" />
+		<result column="user_code" property="userCode" />
+		<result column="type_code" property="typeCode" />
+		
+		<result column="entryTime" property="entryTime" />
+		<result column="state" property="state" />
+		<result column="user_name" property="userName" />
+	</resultMap>
+
+	<!-- 查询条件 -->
+	<sql id="TiaoJian">
+		where 1=1
+		<if test="id !=null">
+			and id=#{id}
+		</if>
+		<if test="code !=null and code !=''">
+			and code like  #{code}
+		</if>
+		<if test="userCode !=null and userCode !=''">
+			and user_code like  #{userCode} 
+		</if>
+		
+		
+		<if test="entryTime !=null">
+		<!-- mybatis 3.3.0中对于时间参数进行比较有的一个bug.
+			 如果拿传入的时间类型参数与空字符串”进行对比判断则会引发异常. 
+			 所以在上面的代码中去该该判断, 只保留非空判断就正常了 -->
+			and entryTime like #{entryTime}
+		</if>
+		<if test="typeCode !=null and typeCode !=''">
+			and type_code like  #{typeCode} 
+		</if>
+		<if test="state !=null and state !=''">
+			and state like #{state}
+		</if>
+	</sql>
+
+
+	<!-- table all fields sql片段 -->
+	<sql id="Base_Column_List">
+		id, user_code , code, entryTime,type_code,state
+	</sql>
+	<!-- table all fields sql片段 -->
+	<sql id="UserName">
+		p2c.order
+	</sql>
+
+
+
+	<insert id="insert" parameterType="Object">
+		insert into
+		<include refid="UserName" />
+		( code ,user_code , entryTime, type_code,state)
+		values(#{code}, #{userCode},
+		#{entryTime}, #{typeCode},#{state})
+	</insert>
+
+	<delete id="delete" parameterType="Object">
+		delete from
+		<include refid="UserName" />
+		<include refid="TiaoJian"></include>
+
+	</delete>
+
+	<!-- 修改记录，只修改只不为空的字段 -->
+	<update id="update" parameterType="Object">
+		update
+		<include refid="UserName" />
+		set
+		<trim suffixOverrides=",">
+			<if test="userCode != null and userCode != '' ">
+				user_code = #{userCode},
+			</if>
+			
+			<if test="entryTime != null ">
+				entryTime = #{entryTime},
+			</if>
+			<if test="typeCode != null and typeCode != ''">
+				type_code = #{typeCode},
+			</if>
+			<if test="state != null and state != '' ">
+				state = #{state},
+			</if>
+		</trim>
+		where code = #{code}
+	</update>
+
+
+
+	<!-- 根据id 查询系统用户 -->
+	<select id="selectById" resultMap="BaseResultMap"
+		parameterType="Object">
+		select
+		<include refid="Base_Column_List" />
+		from
+		<include refid="UserName" />
+		where id=#{id}
+	</select>
+	<!-- 根据code 查询系统用户 -->
+	<select id="selectByCode" resultMap="BaseResultMap"
+		parameterType="Object">
+		select
+		<include refid="Base_Column_List" />
+		,( select  us.name from p2c.user as us where us.code=p2c.order.user_code) as user_name
+		from
+		<include refid="UserName" />
+		where code=#{code}
+	</select>
+	<!-- 查询系统用户列表 -->
+	<select id="selectCount" resultType="java.lang.Integer"
+		parameterType="Object">
+		select count(1)
+		from
+		<include refid="UserName" />
+		<include refid="TiaoJian" />
+	</select>
+
+
+	<!-- 查询系统用户列表 -->
+	<select id="selectModel" resultMap="BaseResultMap"
+		parameterType="Object">
+		select
+		<include refid="Base_Column_List" />
+		,( select  us.name from p2c.user as us where us.code=p2c.order.user_code) as user_name
+		from
+		<include refid="UserName" />
+		<include refid="TiaoJian" />
+		order by id desc
+		limit ${rowStart},${pageLimit}
+	</select>
+	<!-- 查询系统用户列表 -->
+	<select id="selectAll" resultMap="BaseResultMap"
+		parameterType="Object">
+		select
+		<include refid="Base_Column_List" />
+		from
+		<include refid="UserName" />
+		<include refid="TiaoJian" />
+	</select>
+
+
+
+</mapper>   
