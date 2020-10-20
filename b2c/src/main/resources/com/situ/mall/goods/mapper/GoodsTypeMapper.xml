@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.situ.mall.goods.mapper.GoodsTypeMapper">
+
+	<!-- Result Map 结果映射 查询时使用 -->
+	<resultMap id="BaseResultMap" type="com.situ.mall.goods.model.GoodsTypeModel">
+		<result column="id" property="id" />
+		<result column="code" property="code" />
+		<result column="name" property="name" />
+		<result column="descr" property="descr" />
+		<result column="parentcode" property="parentcode" />
+	</resultMap>
+
+	<!-- 查询条件 -->
+	<sql id="TiaoJian">
+		where 1=1
+		<if test="id !=null">
+			and id=#{id}
+		</if>
+		<if test="code !=null and code !=''">
+			and code like #{code}
+		</if>
+		<if test="name !=null and name !=''">
+			and name like #{name}
+		</if>
+		<if test="descr !=null and descr !=''">
+			and descr like #{descr}
+		</if>
+		<if test="parentcode !=null and parentcode !=''">
+			and parentcode like #{parentcode}
+		</if>
+	</sql>
+
+
+	<!-- table all fields sql片段 -->
+	<sql id="Base_Column_List">
+		id, code, name, descr,parentcode
+	</sql>
+	<!-- table all fields sql片段 -->
+	<sql id="UserName">
+		p2c.goods_type
+	</sql>
+
+
+
+	<insert id="insert" parameterType="Object">
+		insert into
+		<include refid="UserName" />
+		(code, name, descr,parentcode)
+		values(#{code}, #{name},
+		#{descr},#{parentcode})
+	</insert>
+
+	<delete id="delete" parameterType="Object">
+		delete from
+		<include refid="UserName" />
+		<include refid="TiaoJian"></include>
+
+	</delete>
+
+	<!-- 修改记录，只修改只不为空的字段 -->
+	<update id="update" parameterType="Object">
+		update
+		<include refid="UserName" />
+		set
+		<trim suffixOverrides=",">
+			<if test="name != null and name != '' ">
+				name = #{name},
+			</if>
+			<if test="descr != null and descr != '' ">
+				descr = #{descr},
+			</if>
+			<if test="parentcode != null and parentcode != '' ">
+				parentcode = #{parentcode},
+			</if>
+		</trim>
+		where code = #{code}
+	</update>
+
+
+
+	<!-- 根据id 查询系统用户 -->
+	<select id="selectById" resultMap="BaseResultMap"
+		parameterType="Object">
+		select
+		<include refid="Base_Column_List" />
+		from
+		<include refid="UserName" />
+		where id=#{id}
+	</select>
+	<!-- 根据code 查询系统用户 -->
+	<select id="selectByCode" resultMap="BaseResultMap"
+		parameterType="Object">
+		select
+		<include refid="Base_Column_List" />
+		from
+		<include refid="UserName" />
+		where code=#{code}
+	</select>
+	<!-- 查询系统用户列表 -->
+	<select id="selectCount" resultType="java.lang.Integer"
+		parameterType="Object">
+		select count(1)
+		from
+		<include refid="UserName" />
+		<include refid="TiaoJian" />
+	</select>
+
+
+	<!-- 查询系统用户列表 -->
+	<select id="selectModel" resultMap="BaseResultMap"
+		parameterType="Object">
+		select
+		<include refid="Base_Column_List" />
+		from
+		<include refid="UserName" />
+		<include refid="TiaoJian" />
+		limit ${rowStart},${pageLimit}
+	</select>
+	<!-- 查询系统用户列表 -->
+	<select id="selectAll" resultMap="BaseResultMap"
+		parameterType="Object">
+		select
+		<include refid="Base_Column_List" />
+		from
+		<include refid="UserName" />
+		<include refid="TiaoJian" />
+	</select>
+
+
+
+</mapper>   

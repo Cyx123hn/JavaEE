@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC 
+"-//mybatis.org//DTD Config 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+		<!-- 打印查询语句 -->
+	<settings>
+		<setting name="logImpl" value="STDOUT_LOGGING" />
+	</settings>
+
+	<typeAliases>
+	<!-- 别名 -->
+ 	<typeAlias  type="com.situ.mall.user.model.UserModel" /> 
+	<typeAlias  type="com.situ.mall.goods.model.GoodsTypeModel" />	
+	<typeAlias  type="com.situ.mall.goods.model.GoodsModel" />
+	<typeAlias  type="com.situ.mall.goods.model.GoodsImgModel" />
+	<typeAlias  type="com.situ.mall.order.model.OrderCarModel" />
+	<typeAlias  type="com.situ.mall.order.model.OrderModel" />
+	<typeAlias  type="com.situ.mall.order.model.OrderGoodsModel" />
+	
+	</typeAliases>
+
+	<mappers>
+		<mapper resource="com/situ/mall/user/mapper/UserMapper.xml" /> 
+		<mapper resource="com/situ/mall/goods/mapper/GoodsTypeMapper.xml" />
+	    <mapper resource="com/situ/mall/goods/mapper/GoodsMapper.xml" />
+	    <mapper resource="com/situ/mall/goods/mapper/GoodsImgMapper.xml" />
+	    <mapper resource="com/situ/mall/order/mapper/OrderCarMapper.xml" />
+	<mapper resource="com/situ/mall/order/mapper/OrderMapper.xml" />
+	<mapper resource="com/situ/mall/order/mapper/OrderGoodsMapper.xml" />
+	
+	</mappers>
+</configuration>
