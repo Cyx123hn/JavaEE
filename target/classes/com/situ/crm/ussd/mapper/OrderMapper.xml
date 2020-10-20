@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.situ.crm.ussd.mapper.OrderMapper">
+  	<resultMap id="BaseResultMap" type="com.situ.crm.ussd.model.OrderModel">
+		<result column="id" property="id" />
+		<result column="product_code" property="prodCode" />
+		<result column="product_name" property="prodName" />
+		<result column="user_code" property="userCode" />
+		<result column="user_name" property="userName" />
+		<result column="cust_code" property="custCode" />
+		<result column="cust_name" property="custName" />
+		<result column="count" property="count" />
+		<result column="status_code" property="statusCode" />
+		<result column="status_name" property="statusName" />
+		<result column="role_code" property="roleCode" />
+		<result column="time" property="time" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		o.id,o.user_code,u.user_name,o.cust_code,c.cust_name,
+		o.product_code,p.product_name,o.status_code,s1.status_name,
+		u.role_code,o.count,o.time
+	</sql>
+	<!-- 查询条件 -->
+	<sql id="Example_Where_Clause">
+		where 1=1 
+			<if test="prodCode != null and prodCode != ''">
+				and o.product_code like #{prodCode} 
+			</if>
+			<if test="prodName != null and prodName != ''">
+				and p.product_name like #{prodName} 
+			</if>
+			<if test="userCode != null and userCode != ''">
+				and o.user_code like #{userCode} 
+			</if>
+			<if test="userName != null and userName != ''">
+				and u.user_name like #{userName} 
+			</if>	
+			<if test="custCode != null and custCode != ''">
+				and o.cust_code like #{custCode} 
+			</if>
+			<if test="custName != null and custName != ''">
+				and c.cust_name like #{custName} 
+			</if>	
+			<if test="statusCode != null and statusCode != ''">
+				and o.status_code like #{statusCode} 
+			</if>
+			<if test="statusName != null and statusName != ''">
+				and s1.status_name like #{statusName} 
+			</if>		
+			<if test="id != null and id != ''">
+				and o.id like #{id} 
+			</if>
+			
+	</sql>
+	<insert id="insert" parameterType="Object">
+		insert into rbac.order_info(product_code, user_code,cust_code,status_code,count,time)
+		values(#{prodCode}, #{userCode},#{custCode}, #{statusCode},#{count},#{time})
+<!-- 		{}为实体类的属性名 -->
+	</insert>
+	<delete id="delete" parameterType="Object">
+		delete from rbac.order_info where id = #{id}
+	</delete>
+	<!-- 修改记录，只修改只不为空的字段 -->
+	<update id="update" parameterType="Object">
+		update rbac.order_info set 
+		<trim suffixOverrides=",">
+			<if test="prodCode != null and prodCode != ''">
+				 product_code = #{prodCode} ,
+			</if>
+			<if test="custCode != null and custCode != ''">
+				 cust_code = #{custCode} ,
+			</if>
+			<if test="statusCode != null and statusCode != ''">
+				 status_code = #{statusCode} ,
+			</if>
+			<if test="userCode != null and userCode != ''">
+				 user_code = #{userCode} ,
+			</if>
+			<if test="count != null and count != '' ">
+				count = #{count},
+			</if>
+			<if test="time != null  ">
+				time = #{time},
+			</if>
+		</trim>
+		where id = #{id}
+	</update>
+		<select id="selectCount" resultType="java.lang.Integer" >
+		select count(1)  FROM rbac.order_info o left join 
+rbac.user u on o.user_code =u.user_code left join
+rbac.customer_info c on o.cust_code =c.cust_code left join
+rbac.product_info p on p.product_code =o.product_code left join
+rbac.status s1 on s1.status_code=o.status_code
+		<include refid="Example_Where_Clause" />
+	</select>
+	<select id="selectList" resultMap="BaseResultMap" parameterType="Object">
+		select <include refid="Base_Column_List" />
+	 FROM rbac.order_info o left join 
+rbac.user u on o.user_code =u.user_code left join
+rbac.customer_info c on o.cust_code =c.cust_code left join
+rbac.product_info p on p.product_code =o.product_code left join
+rbac.status s1 on s1.status_code=o.status_code
+		<include refid="Example_Where_Clause" />
+		<if test="pageOn==true">
+		limit ${rowStart},${pageLimit}
+		</if>
+	</select>
+  </mapper>

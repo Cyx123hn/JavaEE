@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.situ.crm.ussd.mapper.StatusInfoMapper">
+  	<resultMap id="BaseResultMap" type="com.situ.crm.ussd.model.StatusInfoModel">
+		<result column="id" property="id" />
+		<result column="role_code" property="roleCode" />
+		<result column="status_code" property="statusCode" />
+		<result column="role_name" property="roleName" />
+		<result column="status_name" property="statusName" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		si.id,si.status_code,si.role_code,s.status_name,r.role_name
+	</sql>
+	<!-- 查询条件 -->
+	<sql id="Example_Where_Clause">
+		where 1=1 
+			<if test="roleName != null and roleName != ''">
+				and r.role_name like #{roleName} 
+			</if>
+			<if test="statusName != null and statusName != ''">
+				and s.status_name like #{statusName} 
+			</if>	
+			<if test="roleCode != null and roleCode != ''">
+				and r.role_code = #{roleCode} 
+			</if>
+			<if test="statusCode != null and statusCode != ''">
+				and si.status_code = #{statusCode} 
+			</if>	
+			<if test="id != null and id != ''">
+				and si.id like #{id} 
+			</if>
+			
+	</sql>
+	<insert id="insert" parameterType="Object">
+		insert into rbac.status_info(role_code, status_code)
+		values(#{roleCode}, #{statusCode})
+<!-- 		{}为实体类的属性名 -->
+	</insert>
+	<delete id="delete" parameterType="Object">
+		delete from rbac.status_info where id = #{id}
+	</delete>
+	<!-- 修改记录，只修改只不为空的字段 -->
+	<update id="update" parameterType="Object">
+		update rbac.status_info set 
+		<trim suffixOverrides=",">
+			<if test="roleCode != null and roleCode != '' ">
+				role_code = #{roleCode},
+			</if>
+			<if test="statusCode != null and statusCode != '' ">
+				status_code = #{statusCode},
+			</if>
+		</trim>
+		where id = #{id}
+	</update>
+		<select id="selectCount" resultType="java.lang.Integer" >
+		select count(1) FROM rbac.status_info si  left join rbac.status s 
+    	on  si.status_code =s.status_code left join rbac.role r on
+ 		si.role_code=r.role_code 
+		<include refid="Example_Where_Clause" />
+	</select>
+	<select id="selectList" resultMap="BaseResultMap" parameterType="Object">
+		select <include refid="Base_Column_List" />
+		FROM rbac.status_info si  left join rbac.status s 
+    	on  si.status_code =s.status_code left join rbac.role r on
+ 		si.role_code=r.role_code 
+		<include refid="Example_Where_Clause" />
+		<if test="pageOn==true">
+		limit ${rowStart},${pageLimit}
+		
+		</if>
+	</select>
+  </mapper>

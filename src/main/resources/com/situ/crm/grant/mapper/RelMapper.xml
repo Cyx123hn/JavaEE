@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.situ.crm.grant.mapper.RelMapper">
+  	<resultMap id="BaseResultMap" type="com.situ.crm.grant.model.RelModel">
+		<result column="id" property="id" />
+		<result column="role_code" property="roleCode" />
+		<result column="menu_code" property="menuCode" />
+		<result column="role_name" property="roleName" />
+		<result column="menu_name" property="menuName" />
+	</resultMap>
+	<sql id="Base_Column_List">
+		a.id,a.role_code,a.menu_code,m.menu_name, r.role_name
+	</sql>
+	<!-- 查询条件 -->
+	<sql id="Example_Where_Clause">
+		where 1=1 
+			<if test="roleName != null and roleName != ''">
+				and r.role_name like #{roleName} 
+			</if>
+			<if test="menuName != null and menuName != ''">
+				and m.menu_name like #{menuName} 
+			</if>	
+			<if test="roleCode != null and roleCode != ''">
+				and r.role_code = #{roleCode} 
+			</if>
+			<if test="menuCode != null and menuCode != ''">
+				and m.menu_code = #{menuCode} 
+			</if>	
+			<if test="id != null and id != ''">
+				and a.id like #{id} 
+			</if>
+			
+	</sql>
+	<insert id="insert" parameterType="Object">
+		insert into rbac.access(role_code, menu_code)
+		values(#{roleCode}, #{menuCode})
+<!-- 		{}为实体类的属性名 -->
+	</insert>
+	<delete id="delete" parameterType="Object">
+		delete from rbac.access where id = #{id}
+	</delete>
+	<!-- 修改记录，只修改只不为空的字段 -->
+	<update id="update" parameterType="Object">
+		update rbac.access set 
+		<trim suffixOverrides=",">
+			<if test="roleCode != null and roleCode != '' ">
+				role_code = #{roleCode},
+			</if>
+			<if test="menuCode != null and menuCode != '' ">
+				menu_code = #{menuCode},
+			</if>
+		</trim>
+		where id = #{id}
+	</update>
+		<select id="selectCount" resultType="java.lang.Integer" >
+		select count(1) from  rbac.access a  left join rbac.menu m 
+    	on  a.menu_code =m.menu_code left join rbac.role r on
+ 		a.role_code=r.role_code 
+		<include refid="Example_Where_Clause" />
+	</select>
+	<select id="selectList" resultMap="BaseResultMap" parameterType="Object">
+		select <include refid="Base_Column_List" />
+		FROM rbac.access a  left join rbac.menu m 
+    	on  a.menu_code =m.menu_code left join rbac.role r on
+ 		a.role_code=r.role_code 
+		<include refid="Example_Where_Clause" />
+		order by m.orderBy
+		<if test="pageOn==true">
+		limit ${rowStart},${pageLimit}
+		
+		</if>
+	</select>
+  </mapper>

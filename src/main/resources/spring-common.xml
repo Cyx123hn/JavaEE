@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+	                    http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context 
+		http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/mvc 
+		http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd">
+        <context:annotation-config />
+      <context:property-placeholder location="classpath:jdbc.properties"/>
+<!--   数据源 -->
+  <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+  	<property name="driverClassName" value="${driverName}"></property>
+  	<property name="url" value="${url}"></property>
+  	<property name="username" value="${user}"></property>
+  	<property name="password" value="${password}"></property>
+  </bean>
+  <bean id="jdbcTemplate2" class="org.springframework.jdbc.core.JdbcTemplate">
+  	<property name="dataSource" ref="dataSource"></property>
+  </bean>
+  <!-- MyBatis Sql -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="configLocation" value="classpath:mybatis-config.xml" />
+		<!-- <property name="mapperLocations"> -->
+		<!-- <value>classpath:dao/mapper/*Mapper.xml</value> -->
+		<!-- </property> -->
+	</bean>
+
+	<!-- 扫描mapper.java -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.situ.*.*.mapper" />
+		<!-- <property name="sqlSessionFactory" ref="sqlSessionFactory" /> -->
+	</bean>
+	
+	<bean id ="multipartResolver"
+	class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+	<property name="maxUploadSize" value="104857600"></property>
+	<property name="maxInMemorySize" value="4096"></property>
+	<property name="defaultEncoding" value="UTF-8"></property>
+	</bean>
+	<!--SpringMVC 上传文件-->
+ </beans>

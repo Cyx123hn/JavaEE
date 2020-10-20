@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.situ.crm.grant.mapper.UserMapper">
+  	<resultMap id="BaseResultMap" type="com.situ.crm.grant.model.UserModel">
+		<result column="id" property="id" />
+		<result column="user_code" property="code" />
+		<result column="user_name" property="name" />
+		<result column="user_pass" property="userPass" />
+		<result column="role_code" property="roleCode"/>
+		<result column="role_name" property="roleName"/>
+		<result column="parent_code" property="parentCode"/>
+		<result column="parent_name" property="parentName"/>
+	</resultMap>
+	<sql id="Base_Column_List">
+		u.id, user_code, user_name, user_pass,u.role_code,role_name,parent_code
+	</sql>
+	<!-- 查询条件 -->
+	<sql id="Example_Where_Clause">
+		where 1=1 
+			<if test="code != null and code != ''">
+				and user_code = #{code} 
+			</if>
+			<if test="name != null and name != ''">
+				and user_name = #{name} 
+			</if>	
+			<if test="roleCode != null and roleCode != ''">
+				and u.role_code = #{roleCode} 
+			</if>
+			<if test="parentCode != null and parentCode != ''">
+				and parent_code = #{parentCode} 
+			</if>	
+	</sql>
+	<insert id="insert" parameterType="Object">
+		insert into rbac.user(user_code, user_name, user_pass,role_code,parent_code)
+		values(#{code}, #{name},#{userPass},#{roleCode},#{parentCode})
+<!-- 		{}为实体类的属性名 -->
+	</insert>
+	<delete id="delete" parameterType="Object">
+		delete from rbac.user where user_code = #{code}
+	</delete>
+	<!-- 修改记录，只修改只不为空的字段 -->
+	<update id="update" parameterType="Object">
+		update rbac.user set 
+		<trim suffixOverrides=",">
+			<if test="name != null and name != '' ">
+				user_name = #{name},
+			</if>
+			<if test="userPass != null and userPass != '' ">
+				user_pass = #{userPass},
+			</if>
+			<if test="roleCode != null and roleCode != '' ">
+				role_code = #{roleCode},
+			</if>
+			<if test="parentCode != null and parentCode != '' ">
+				parent_code = #{parentCode},
+			</if>
+		</trim>
+		where user_code = #{code}
+	</update>
+		<select id="selectCount" resultType="java.lang.Integer" 
+	parameterType="UserModel">
+		select count(1) from rbac.user u
+		<include refid="Example_Where_Clause" />
+	</select>
+	<select id="selectList" resultMap="BaseResultMap" parameterType="Object">
+		select <include refid="Base_Column_List" />
+		,(select p.user_name from rbac.user p where p.user_code=u.parent_code ) as parent_name
+		from rbac.user u left join 
+       rbac.role r on u.role_code=r.role_code 
+		<include refid="Example_Where_Clause" />
+		<if test="pageOn==true">
+		limit ${rowStart},${pageLimit}
+		</if>
+	</select>
+  </mapper>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.situ.crm.grant.mapper.MenuMapper">
+  	<resultMap id="BaseResultMap" type="com.situ.crm.grant.model.MenuModel">
+		<result column="id" property="id" />
+		<result column="menu_code" property="code" />
+		<result column="menu_name" property="name" />
+		<result column="menu_url" property="menuUrl" />
+		<result column="orderBy" property="order"/>
+		<result column="parent_code" property="parentCode"/>
+		<result column="parent_name" property="parentName"/>
+		<result column="img" property="img"/>
+	</resultMap>
+	<sql id="Base_Column_List">
+		id, menu_code, menu_name, menu_url,orderBy,parent_code,img
+	</sql>
+	<!-- 查询条件 -->
+	<sql id="Example_Where_Clause">
+		where 1=1 
+			<if test="code != null and code != ''">
+				and menu_code like #{code} 
+			</if>
+			<if test="name != null and name != ''">
+				and menu_name like #{name} 
+			</if>	
+			<if test="menuUrl != null and menuUrl != ''">
+				and menu_url = #{menuUrl} 
+			</if>
+			<if test="order != null and order != ''">
+				and orderBy = #{order} 
+			</if>	
+			<if test="parentCode != null and parentCode != ''">
+				and parent_code = #{parentCode} 
+			</if>	
+	</sql>
+	<insert id="insert" parameterType="Object">
+		insert into rbac.menu(menu_code, menu_name, menu_url,orderBy,parent_code,img)
+		values(#{code}, #{name},#{menuUrl},#{order},#{parentCode},#{img})
+<!-- 		{}为实体类的属性名 -->
+	</insert>
+	<delete id="delete" parameterType="Object">
+		delete from rbac.menu where menu_code = #{code}
+	</delete>
+	<!-- 修改记录，只修改只不为空的字段 -->
+	<update id="update" parameterType="Object">
+		update rbac.menu set 
+		<trim suffixOverrides=",">
+			<if test="name != null and name != '' ">
+				menu_name = #{name},
+			</if>
+			<if test="menuUrl != null and menuUrl != '' ">
+				menu_url = #{menuUrl},
+			</if>
+			<if test="order != null and order != '' ">
+				orderBy = #{order},
+			</if>
+			<if test="parentCode != null and parentCode != '' ">
+				parent_code = #{parentCode},
+			</if>
+			<if test="img != null and img != '' ">
+				img = #{img},
+			</if>
+		</trim>
+		where menu_code = #{code}
+	</update>
+		<select id="selectCount" resultType="java.lang.Integer" >
+		select count(1) from rbac.menu 
+		<include refid="Example_Where_Clause" />
+	</select>
+	<select id="selectList" resultMap="BaseResultMap" parameterType="Object">
+		select <include refid="Base_Column_List" />
+		,(select p.menu_name from rbac.menu p where p.menu_code=m.parent_code)  as parent_name
+		from rbac.menu m
+		<include refid="Example_Where_Clause" />
+		order by orderBy
+		<if test="pageOn==true">
+		limit ${rowStart},${pageLimit}
+		</if>
+	</select>
+	<select id="selectMenu" resultMap="BaseResultMap" parameterType="Object">
+		select <include refid="Base_Column_List" />
+		from rbac.menu where parent_code!='menu'
+	</select>
+  </mapper>
